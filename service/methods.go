@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-// NewCashe создает новый кэш
-func NewCashe(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Cashe {
-	cashe := &Cashe{
+// NewCache создает новый кэш
+func NewCache(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Cache {
+	cache := &Cache{
 		Entries:           make(map[string]Entry),
 		DefaultExpiration: defaultExpiration,
 		CleanuoInterval:   cleanupInterval,
@@ -15,11 +15,11 @@ func NewCashe(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Ca
 		Stop:              make(chan bool),
 	}
 
-	return cashe
+	return cache
 }
 
 // Set добавляет/обновляет значение
-func (c *Cashe) Set(key string, value interface{}, ttl time.Duration) {
+func (c *Cache) Set(key string, value interface{}, ttl time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -44,7 +44,7 @@ func (c *Cashe) Set(key string, value interface{}, ttl time.Duration) {
 }
 
 // Get возвращает значение по ключу
-func (c *Cashe) Get(key string) (interface{}, bool) {
+func (c *Cache) Get(key string) (interface{}, bool) {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -62,7 +62,7 @@ func (c *Cashe) Get(key string) (interface{}, bool) {
 }
 
 // Delete удаляет значение по ключу
-func (c *Cashe) Delete(key string) error {
+func (c *Cache) Delete(key string) error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -75,7 +75,7 @@ func (c *Cashe) Delete(key string) error {
 }
 
 // Exists проверяeт существование ключа
-func (c *Cashe) Exists(key string) bool {
+func (c *Cache) Exists(key string) bool {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -93,6 +93,6 @@ func (c *Cashe) Exists(key string) bool {
 }
 
 // deleteOld удаляет старые данные
-func (c *Cashe) deleteOld() {
+func (c *Cache) deleteOld() {
 
 }
