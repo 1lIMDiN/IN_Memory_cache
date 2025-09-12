@@ -9,7 +9,7 @@ import (
 type Cache struct {
 	sync.RWMutex
 	DefaultExpiration time.Duration
-	CleanuoInterval   time.Duration
+	CleanupInterval   time.Duration
 	MaxSize           int
 	Entries           map[string]Entry
 	Stop              chan bool

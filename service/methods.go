@@ -10,9 +10,13 @@ func NewCache(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Ca
 	cache := &Cache{
 		Entries:           make(map[string]Entry),
 		DefaultExpiration: defaultExpiration,
-		CleanuoInterval:   cleanupInterval,
+		CleanupInterval:   cleanupInterval,
 		MaxSize:           maxSize,
 		Stop:              make(chan bool),
+	}
+
+	if cleanupInterval > 0 {
+
 	}
 
 	return cache
@@ -92,6 +96,39 @@ func (c *Cache) Exists(key string) bool {
 	return true
 }
 
+// Keys возвращает все ключи
+func (c *Cache) Keys() []string {
+	c.RLock()
+	defer c.RUnlock()
+
+	keys := make([]string, 0, len(c.Entries))
+	now := time.Now().UnixNano()
+
+	for k, v := range c.Entries {
+		if v.Expiration == 0 || now <= v.Expiration {
+			keys = append(keys, k)
+		}
+	}
+
+	return keys
+}
+
+// Сount возвращает кол-во актульных элементов
+func (c *Cache) Count() int {
+	c.RLock()
+	defer c.RUnlock()
+
+	count := 0
+	now := time.Now().UnixNano()
+
+	for _, v := range c.Entries {
+		if v.Expiration == 0 || now <= v.Expiration {
+			count++
+		}
+	}
+
+	return count
+}
 // deleteOld удаляет старые данные
 func (c *Cache) deleteOld() {
 
