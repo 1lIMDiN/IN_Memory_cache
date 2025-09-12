@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// Cashe - кэш с TTL
-type Cashe struct {
+// Cache - кэш с TTL
+type Cache struct {
 	sync.RWMutex
 	DefaultExpiration time.Duration
 	CleanuoInterval   time.Duration
