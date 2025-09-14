@@ -16,7 +16,7 @@ func NewCache(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Ca
 	}
 
 	if cleanupInterval > 0 {
-
+		go cache.clean()
 	}
 
 	return cache
@@ -113,7 +113,7 @@ func (c *Cache) Keys() []string {
 	return keys
 }
 
-// Сount возвращает кол-во актульных элементов
+// Сount возвращает кол-во актуальных элементов
 func (c *Cache) Count() int {
 	c.RLock()
 	defer c.RUnlock()
@@ -129,7 +129,64 @@ func (c *Cache) Count() int {
 
 	return count
 }
+
+// clean очищает просроченные записи
+func (c *Cache) clean() {
+	ticker := time.NewTicker(c.CleanupInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			c.deleteEntry()
+		case <-c.Stop:
+			return
+		}
+	}
+}
+
+// stopClean останавливает clean()
+func (c *Cache) StopClean() {
+	c.Stop <- true
+}
+
+// deleteEntry удаляет все просроченные записи
+func (c *Cache) deleteEntry() {
+	c.Lock()
+	defer c.Unlock()
+
+	now := time.Now().UnixNano()
+	for key, val := range c.Entries {
+		if val.Expiration > 0 && now > val.Expiration {
+			delete(c.Entries, key)
+		}
+	}
+}
+
 // deleteOld удаляет старые данные
 func (c *Cache) deleteOld() {
+	if len(c.Entries) == 0 {
+		return
+	}
 
+	var oldKey string
+	var oldTime time.Time
+
+	for key, val := range c.Entries {
+		if oldTime.IsZero() || val.Created.Before(oldTime) {
+			oldKey = key
+			oldTime = val.Created
+		}
+	}
+
+	if oldKey != "" {
+		delete(c.Entries, oldKey)
+	}
+}
+
+// FlushAll очищает все данные
+func (c *Cache) FlushAll() {
+	c.Lock()
+	defer c.Unlock()
+	c.Entries = make(map[string]Entry)
 }

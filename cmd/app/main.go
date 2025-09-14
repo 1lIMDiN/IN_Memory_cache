@@ -51,4 +51,9 @@ func main() {
 	fmt.Println("Count before delete:", cache.Count())
 	cache.Delete("DNS:admin")
 	fmt.Println("Count after delete:", cache.Count())
+
+	// Останавливаем чистку
+	defer cache.StopClean()
+	// Чистим весь кэш
+	defer cache.FlushAll()
 }
