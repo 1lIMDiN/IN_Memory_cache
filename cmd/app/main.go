@@ -49,7 +49,9 @@ func main() {
 
 	// Удаляем Admin и проверяем количество актуальных элементов
 	fmt.Println("Count before delete:", cache.Count())
-	cache.Delete("DNS:admin")
+	if err := cache.Delete("DNS:admin"); err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println("Count after delete:", cache.Count())
 
 	// Останавливаем чистку
