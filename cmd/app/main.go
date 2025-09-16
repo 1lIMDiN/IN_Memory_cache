@@ -44,7 +44,7 @@ func main() {
 	if v, ok := cache.Get("DNS:admin"); !ok {
 		fmt.Println("DNS:admin expired")
 	} else {
-		fmt.Println("DNS:admin exists: ", v)
+		fmt.Println("DNS:admin exists:", v)
 	}
 
 	// Удаляем Admin и проверяем количество актуальных элементов

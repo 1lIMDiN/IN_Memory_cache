@@ -15,6 +15,7 @@ func NewCache(defaultExpiration, cleanupInterval time.Duration, maxSize int) *Ca
 		Stop:              make(chan bool),
 	}
 
+	// Запуск горутины для очистки
 	if cleanupInterval > 0 {
 		go cache.clean()
 	}
